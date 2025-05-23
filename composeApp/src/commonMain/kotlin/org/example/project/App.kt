@@ -51,6 +51,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import reviu_desktop_app.composeapp.generated.resources.Res
 import reviu_desktop_app.composeapp.generated.resources.compose_multiplatform
 import java.awt.Color
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -203,7 +204,9 @@ fun App(driver: SqlDriver, esMobil: Boolean) {
                                 }
                             } else {
                                 scope.launch {
-                                    usuari = api.getAuthentificationUsuari(correu, contrasenya)
+                                    var contrasenyaencriptada  = com.example.reviu_app_jpc.EncriptarContrasenya(contrasenya)  // per encriptar constrasenya
+
+                                    usuari = api.getAuthentificationUsuari(correu, contrasenyaencriptada)
                                     val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                                     val calendar = Calendar.getInstance()
                                     calendar.add(Calendar.DAY_OF_MONTH, -3)
@@ -281,3 +284,13 @@ fun App(driver: SqlDriver, esMobil: Boolean) {
     }
 }
 
+
+fun EncriptarContrasenya(contrasenya: String): String {
+    val sha256Digest = MessageDigest.getInstance("SHA-256")
+    val inputBytes = contrasenya.toByteArray()
+    val hashedBytes = sha256Digest.digest(inputBytes)
+    val hashedString = hashedBytes.joinToString("") {
+        "%02x".format(it)
+    }
+    return  hashedString
+}

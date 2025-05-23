@@ -172,7 +172,7 @@ compose.desktop {
 
         nativeDistributions {
             modules("java.sql")
-            targetFormats(TargetFormat.Exe, TargetFormat.Msi, TargetFormat.AppImage /*TargetFormat.Deb*/)
+            targetFormats(TargetFormat.Exe, TargetFormat.Msi, TargetFormat.AppImage, TargetFormat.Deb)
             packageName = "reviu"  // "org.example.project"
             packageVersion = "1.0.0"
 

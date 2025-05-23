@@ -235,7 +235,10 @@ class BottomBar() {
                             items.forEachIndexed { index, item ->
                                 NavigationBarItem(
                                     selected = viewModel.selectedItem.value == index,
-                                    onClick = { viewModel.selectedItem.value = index },
+                                    onClick = {
+                                        viewModel.selectedItemAnterior.value = viewModel.selectedItem.value
+                                        viewModel.selectedItem.value = index
+                                              },
                                     label = {
                                         Text(
                                             text = item,
@@ -264,6 +267,7 @@ class BottomBar() {
                             IniciFragment(esMobil, scope, snackbarHostState)
                         }
                         1 -> {
+                            userId = null
                             PerfilFragment(esMobil, scope, snackbarHostState)
                         }
                         2 -> {
@@ -522,7 +526,6 @@ class BottomBar() {
                     color = androidx.compose.material3.MaterialTheme.colorScheme.background
                 ) {
                     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-//                    var selectedItem by remember { mutableStateOf(0) }
 
                     ModalNavigationDrawer(
                         drawerContent = {
@@ -812,11 +815,9 @@ class BottomBar() {
         runBlocking {
             var cor = launch {
                 user = getUser()
-                llistaValoracionsUsuarisSeguits =
-                    api.getValoracions(user!!.usuariId!!.toInt(), user!!.ultimaConnexio!!)
+                llistaValoracionsUsuarisSeguits = api.getValoracions(user!!.usuariId!!.toInt(), user!!.ultimaConnexio!!)
                 usuari = api.getUsuari(user!!.usuariId!!.toInt())
                 menuItemDataLlista = List(usuari!!.llistes!!.size) { it }
-
             }
             cor.join()
         }
@@ -1255,9 +1256,6 @@ class BottomBar() {
                     items(llistaValoracionsUsuarisSeguits!!) { element ->
                         var expandedLlista by remember { mutableStateOf(false) }
                         Card(
-//                            modifier = Modifier
-//                                .fillParentMaxWidth()
-//                                .padding(8.dp),
                             modifier =
                                 if (esMobil) {
                                     Modifier
@@ -1276,14 +1274,13 @@ class BottomBar() {
                                     } else {
                                         Modifier.fillParentMaxWidth().padding(70.dp, 0.dp)
                                     }
-
-                                        .clickable {
-                                            userId = element.fkUsuariId
-                                            viewModel.selectedItemAnterior.value =
-                                                viewModel.selectedItem.value
-                                            viewModel.selectedItem.value = 8
-                                            println(viewModel.selectedItem.value)
-                                        }
+                                    .clickable {
+                                        userId = element.fkUsuariId
+                                        viewModel.selectedItemAnterior.value =
+                                            viewModel.selectedItem.value
+                                        viewModel.selectedItem.value = 8
+                                        println(viewModel.selectedItem.value)
+                                    }
                                 ) {
                                     if (element.fkUsuari!!.fotoUsuari == null) {
                                         AsyncImage(
@@ -1661,7 +1658,6 @@ class BottomBar() {
                 }
                 corrutina.join()
             }
-
         } else {
             runBlocking {
                 val corrutina = launch {
@@ -1669,9 +1665,8 @@ class BottomBar() {
                 }
                 corrutina.join()
             }
-
         }
-        userId = null
+
 
         var getLlistesUsuari by remember { mutableStateOf<List<Lliste>?>(null) }
         runBlocking {
@@ -1688,33 +1683,15 @@ class BottomBar() {
         val openDialogBorrarLlista = remember { mutableStateOf(false) }
         var llistaId = remember { mutableIntStateOf(0) }
 
-        var tePermisArxius by remember { mutableStateOf(false) }
-//    val requestPermisLauncher = rememberLauncherForActivityResult(
-//        ActivityResultContracts.RequestPermission()
-//    ) { tePermisArxius = it }
-//    val launcher = rememberLauncherForActivityResult(
-//        contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-//        fotoUri = uri
-//        Log.d("FOTOURI", "$uri")
-//    }
-//        lateinit var pickImageLauncher: ActivityResultLauncher<String>
-//        pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-//            uri?.let {
-//                fotoUri = uri
-//            }
-//        }
+
 
         var fotoUsuari by remember { mutableStateOf<String?>(usuari!!.fotoUsuari) }
         var bytes: ByteArray?
-//        val scope = rememberCoroutineScope()
-//        val snackbarHostState = remember { SnackbarHostState() }  // snackbar
-        var fotoUri by remember { mutableStateOf<Uri?>(null) }
-        contingut = null
-        valoracio = null
+//        contingut = null
+//        valoracio = null
 
         LazyColumn(
             state = listState,
-//            modifier = Modifier.padding(10.dp, 10.dp),
             modifier =
                 if (esMobil) {
                     Modifier.padding(10.dp, 10.dp, bottom = 75.dp)
@@ -1779,8 +1756,6 @@ class BottomBar() {
                                     onClick = {
                                         fotoEscullida = true
 //                                            fotoUsuari = pickImage(usuari!!.usuariId!!)
-
-
                                     },
                                     modifier = Modifier.padding(30.dp, 0.dp)
                                 ) {
@@ -1797,6 +1772,8 @@ class BottomBar() {
 
                                 if (fotoEscullida) {
                                     bytes = pickImage()
+                                    fotoEscullida = false
+
                                     if (bytes != null) {
                                         runBlocking {
                                             val corrutina = launch {
@@ -1813,9 +1790,8 @@ class BottomBar() {
                                         scope.launch {
                                             snackbarHostState.showSnackbar("Foto actualitzada")
                                         }
-                                        fotoEscullida = false
-                                    }
 
+                                    }
 
                                 }
 
@@ -2020,7 +1996,6 @@ class BottomBar() {
                                 fontSize = MaterialTheme.typography.h5.fontSize,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = MaterialTheme.typography.h5.fontFamily,
-//                        textAlign = TextAlign.Center,
                             )
                             Button(
                                 onClick = {
@@ -2039,7 +2014,6 @@ class BottomBar() {
                                 )
                             }
                         }
-
                     } else {
                         Text(
                             modifier = Modifier.padding(20.dp, 25.dp).fillMaxWidth(),
@@ -2047,7 +2021,6 @@ class BottomBar() {
                             fontSize = MaterialTheme.typography.h5.fontSize,
                             fontWeight = FontWeight.Bold,
                             fontFamily = MaterialTheme.typography.h5.fontFamily,
-//                        textAlign = TextAlign.Center,
                         )
                     }
 
@@ -2073,7 +2046,6 @@ class BottomBar() {
                                                 runBlocking {
                                                     val corrutina = launch {
                                                         api.postLlistes(llista)
-
                                                     }
                                                     corrutina.join()
                                                 }
@@ -2139,13 +2111,6 @@ class BottomBar() {
                     pageCount = { llista.cuntigutLlistes?.size!! },
                     initialPageOffsetFraction = 0f
                 )
-//                Text(  // fet a sota a la row
-//                    modifier = Modifier.padding(10.dp),
-//                    text = llista.nomLlista,
-//                    fontSize = MaterialTheme.typography.h6.fontSize,
-//                    fontWeight = FontWeight.Bold,
-//                    fontFamily = MaterialTheme.typography.h6.fontFamily,
-//                )
                 Row {
                     Text(
                         modifier = Modifier.padding(10.dp),
@@ -2164,7 +2129,6 @@ class BottomBar() {
                                     llistaId.value = llista.llistaId!!
                                     openDialogBorrarLlista.value = true
                                 },
-//                                modifier = Modifier.padding(0.dp, 0.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                             ) {
                                 Icon(
@@ -2223,49 +2187,20 @@ class BottomBar() {
                     }
                 }
 
-//                if (esUser) {  // fet a falt al costat del nom llista
-//                    if ((llista.llistaId != usuari!!.llistes!!.get(0).llistaId) && (llista.llistaId != usuari!!.llistes!!.get(
-//                            1
-//                        ).llistaId)
-//                    ) {
-//                        Button(
-//                            onClick = {
-//                                llistaId.value = llista.llistaId!!
-//                                openDialogBorrarLlista.value = true
-//                            },
-//                            modifier = Modifier.padding(0.dp, 5.dp).fillMaxWidth(),
-//                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-//                        ) {
-//                            Icon(
-//                                painter = loadIcon("borrar"),
-//                                contentDescription = "borrar",
-//                                modifier = Modifier.size(20.dp),
-//                                tint = primaryLight
-//                            )
-////                            Text(text = "Borrar llista")
-//                        }
-//                    }
-//                }
-
                 if(esMobil) {
                     HorizontalPager(
                         state = pager,
-//                    modifier = Modifier.padding(0.dp, 0.dp),
                         pageSize = PageSize.Fixed(170.dp)  // perque el pager no ocupi tot lo possible
                     ) { page ->
                         Box(
                             modifier =
                                 Modifier
-//                                .padding(10.dp)
-//                                .fillMaxSize()
-//                                .aspectRatio(1f)
                                     .clickable {
                                         viewModel.selectedItemAnterior.value =
                                             viewModel.selectedItem.value
                                         viewModel.selectedItem.value = 7
                                         contingut = llista.cuntigutLlistes[page]?.fkContingut
                                     },
-//                        contentAlignment = Alignment.Center,
                         ) {
                             Column {
                                 AsyncImage(
@@ -2305,17 +2240,8 @@ class BottomBar() {
 //                                    Text(text = " Borrar contingut")
                                     }
 
-//                                Divider(
-//                                    thickness = 1.dp,
-//                                    modifier = Modifier.padding(50.dp, 2.dp)
-//                                )
                                 }
-//                            else {
-//                                Divider(
-//                                    thickness = 1.dp,
-//                                    modifier = Modifier.padding(50.dp, 20.dp)
-//                                )
-//                            }
+
                             }
                         }
                     }
@@ -2349,16 +2275,12 @@ class BottomBar() {
                             Box(
                                 modifier =
                                     Modifier
-//                                    .padding(10.dp)
-//                                    .fillMaxSize()
-//                                    .aspectRatio(0.5f)
                                         .clickable {
                                             viewModel.selectedItemAnterior.value =
                                                 viewModel.selectedItem.value
                                             viewModel.selectedItem.value = 7
                                             contingut = llista.cuntigutLlistes[page]?.fkContingut
                                         },
-//                            contentAlignment = Alignment.Center,
                             ) {
                                 Row {
                                     Column {
@@ -2383,7 +2305,6 @@ class BottomBar() {
                                                         corrutina.join()
                                                     }
 
-//                                    Toast.makeText(context, "S'ha esborrat de la llista", Toast.LENGTH_LONG).show()
                                                     scope.launch {
                                                         snackbarHostState.showSnackbar("S'ha esborrat de la llista")
                                                     }
@@ -2459,7 +2380,6 @@ class BottomBar() {
         var filtre by remember { mutableStateOf("") }
         val scrollState = rememberScrollState()
         val listState = rememberLazyListState()
-//        val scope = rememberCoroutineScope()
         var usuari by remember { mutableStateOf<Usuari?>(null) }
         var user: Usuaris? = null
         runBlocking {
@@ -2508,11 +2428,7 @@ class BottomBar() {
             initialPageOffsetFraction = 0f
         )
 
-        var pager4 = rememberPagerState(
-            initialPage = 0,
-            pageCount = { perqueHasVist!!.results.size },
-            initialPageOffsetFraction = 0f
-        )
+
 
         var pager5 = rememberPagerState(
             initialPage = 0,
@@ -2598,9 +2514,6 @@ class BottomBar() {
                                     Box(
                                         modifier =
                                             Modifier
-//                                            .padding(10.dp)
-//                                            .fillMaxSize()
-//                                            .aspectRatio(0.5f)
                                                 .clickable {
                                                     runBlocking {
                                                         val corrutina = launch {
@@ -2617,9 +2530,7 @@ class BottomBar() {
                                                         corrutina.join()
                                                     }
 
-                                                    viewModel.selectedItemAnterior.value =
-                                                        viewModel.selectedItem.value
-
+                                                    viewModel.selectedItemAnterior.value = viewModel.selectedItem.value
                                                     viewModel.selectedItem.value = 7
                                                 },
                                         contentAlignment = Alignment.Center
@@ -2659,8 +2570,13 @@ class BottomBar() {
                             }
                         }
 
-
                         if (usuari!!.llistes!!.get(1).cuntigutLlistes.size > 0) {
+                            var pager4 = rememberPagerState(
+                                initialPage = 0,
+                                pageCount = { perqueHasVist!!.results.size },
+                                initialPageOffsetFraction = 0f
+                            )
+
                             if (contingutVistDTO!!.name != null) {
                                 Text(
                                     text = "Perquè has vist ",
@@ -2732,9 +2648,6 @@ class BottomBar() {
                                         Box(
                                             modifier =
                                                 Modifier
-//                                                .padding(10.dp)
-//                                                .fillMaxSize()
-//                                                .aspectRatio(0.5f)
                                                     .clickable {
                                                         runBlocking {
                                                             val corrutina = launch {
@@ -2751,7 +2664,7 @@ class BottomBar() {
                                                             corrutina.join()
                                                         }
 
-                                                        viewModel.selectedItem.value =
+                                                        viewModel.selectedItemAnterior.value =
                                                             viewModel.selectedItem.value
                                                         viewModel.selectedItem.value = 7
                                                     },
@@ -2766,10 +2679,8 @@ class BottomBar() {
                                                     contentScale = ContentScale.Fit
                                                 )
                                             }
-
                                         }
                                     }
-
                                 }
                                 if(!esMobil){
                                     Button(
@@ -2792,12 +2703,8 @@ class BottomBar() {
                                         )
                                     }
                                 }
-
                             }
-
                         }
-
-
 
                         Text(
                             text = "Pelis estrenades recentment",
@@ -2838,9 +2745,6 @@ class BottomBar() {
                                     Box(
                                         modifier =
                                             Modifier
-//                                            .padding(10.dp)
-//                                            .fillMaxSize()
-//                                            .aspectRatio(0.5f)
                                                 .clickable {
                                                     runBlocking {
                                                         val corrutina = launch {
@@ -2909,7 +2813,6 @@ class BottomBar() {
                         if (contingutsTitol != null) {
                             getContingutTitol = contingutsTitol
                         }
-
                     }
                     corrutina.join()
                 }
@@ -2936,7 +2839,6 @@ class BottomBar() {
                                                     recomanaciobuscada.id,
                                                     recomanaciobuscada.media_type
                                                 )
-
                                         }
                                         corrutina.join()
                                     }
@@ -2949,8 +2851,8 @@ class BottomBar() {
                                 Text(
                                     text = "${recomanaciobuscada.title}",
                                     modifier = Modifier.fillParentMaxWidth(),
-//                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-//                                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    fontFamily = MaterialTheme.typography.h6.fontFamily,
+                                    fontSize = MaterialTheme.typography.h6.fontSize,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center
                                 )
@@ -2958,8 +2860,8 @@ class BottomBar() {
                                 Text(
                                     text = "${recomanaciobuscada.name}",
                                     modifier = Modifier.fillParentMaxWidth(),
-//                                fontFamily = MaterialTheme.typography.bodyLarge.fontFamily,
-//                                fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+                                    fontFamily = MaterialTheme.typography.h6.fontFamily,
+                                    fontSize = MaterialTheme.typography.h6.fontSize,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center
                                 )
@@ -3020,7 +2922,6 @@ class BottomBar() {
         var temporadaSeleccionada by remember { mutableIntStateOf(1) }
 
         val listState = rememberLazyListState()
-//        val scope = rememberCoroutineScope()
 
         var expandedLlista by remember { mutableStateOf(false) }
 
@@ -3046,8 +2947,6 @@ class BottomBar() {
         var getRecomendation by remember { mutableStateOf<resultatsRecomanacions?>(null) }
 
         var getSeason by remember { mutableStateOf<season?>(null) }
-
-//        val snackbarHostState = remember { SnackbarHostState() }
 
         val openDialogValoracio = remember { mutableStateOf(false) }
 
@@ -3780,8 +3679,8 @@ class BottomBar() {
             corrutina.join()
         }
 
-        contingut = null
-        valoracio = null
+//        contingut = null
+//        valoracio = null
 
         Column(modifier = Modifier.padding(10.dp, 10.dp)) {
             LazyColumn(
@@ -3909,9 +3808,6 @@ class BottomBar() {
                 if (filtre.isNotEmpty()) {
                     items(llistaUsuarisBuscats!!) { element ->
                         Card(
-//                            modifier = Modifier
-//                                .fillParentMaxWidth()
-//                                .padding(5.dp)
                             modifier =
                                 if (esMobil) {
                                     Modifier
@@ -4047,7 +3943,6 @@ class BottomBar() {
                             onClick = {
                                 viewModel.selectedItemAnterior.value = viewModel.selectedItem.value
                                 viewModel.selectedItem.value = 10
-
                             },
                             modifier = Modifier.padding(10.dp, 10.dp),
                         ) {
