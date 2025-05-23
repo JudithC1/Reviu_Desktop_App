@@ -1,0 +1,28 @@
+CREATE TABLE usuaris(
+    id INTEGER NOT NULL PRIMARY KEY,
+    usuariId INTEGER,
+    nomUsuari TEXT NOT NULL,
+    seguidors INTEGER NOT NULL,
+    seguits INTEGER NOT NULL,
+    fkContingutId INTEGER,
+    ultimaConnexio TEXT
+);
+
+selectAll:
+SELECT * FROM usuaris;
+
+selectUsuariById:
+SELECT * FROM usuaris WHERE id = ?;
+
+insertUsuari:
+INSERT INTO usuaris(id, usuariId, nomUsuari, seguidors, seguits, fkContingutId, ultimaConnexio) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+updateUsuari:
+UPDATE usuaris SET ultimaConnexio = ? WHERE id = 1;
+
+updateUsuariContingutId:
+UPDATE usuaris SET fkContingutId = ? WHERE id = 1;
+
+deleteUsuari:
+DELETE FROM usuaris WHERE id = 1;
+
