@@ -45,7 +45,8 @@ class ApiService() : CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
-    var urlApi = "http://172.16.24.149:45455/"
+//    var urlApi = "http://172.16.24.149:45455/"
+    var urlApi = "http://10.46.1.115:45455/"
 
     val client = HttpClient(CIO) {
         install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
@@ -138,7 +139,8 @@ class ApiService() : CoroutineScope {
         val userId = id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
 
         val response: HttpResponse = client.submitFormWithBinaryData(
-            url = "http://172.16.24.149:45455/api/Usuaris/uploadImage",
+//            url = "http://172.16.24.149:45455/api/Usuaris/uploadImage",
+            url = urlApi+ "api/Usuaris/uploadImage",
             formData = formData {
                 append("image", bytes , io.ktor.http.Headers.build {
                     append(io.ktor.http.HttpHeaders.ContentType, "image/jpeg")

@@ -59,6 +59,10 @@ import java.util.Locale
 @Composable
 expect fun loadIcon(name: String): Painter
 
+object principalAct{
+    var estatAct = mutableStateOf(false)
+}
+
 @Composable
 fun App(driver: SqlDriver, esMobil: Boolean) {
 //    MaterialTheme {
@@ -91,6 +95,11 @@ fun App(driver: SqlDriver, esMobil: Boolean) {
             }
 
             if (listUsuaris!!.isNotEmpty()) {
+//                bb.PrincipalActivity(driver, esMobil)
+                principalAct.estatAct.value = true
+            }
+
+            if (principalAct.estatAct.value) {
                 bb.PrincipalActivity(driver, esMobil)
             }
             else if (showPrincipalActivity) {

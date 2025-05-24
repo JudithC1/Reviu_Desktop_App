@@ -122,6 +122,7 @@ import org.example.project.onSecondaryContainerLight
 import org.example.project.onSurfaceLight
 import org.example.project.primaryContainerLight
 import org.example.project.primaryLight
+import org.example.project.principalAct
 import org.example.project.scrimLight
 import org.example.project.secondaryLight
 import org.example.project.surfaceContainerDark
@@ -161,6 +162,7 @@ class BottomBar() {
     var valoracio: Valoracio? = null
     var comentariResp: Comentari? = null
     var driver: SqlDriver? = null
+    var urlApi = "http://172.16.24.149:45455/"
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -465,7 +467,8 @@ class BottomBar() {
                 }
 
                 if (showApp) {
-                    App(driverFun, esMobil)
+//                    App(driverFun, esMobil)
+                    principalAct.estatAct.value = false
                 }
 
             } else {
@@ -637,7 +640,8 @@ class BottomBar() {
                             }
 
                             if (showApp) {
-                                App(driverFun, esMobil)
+//                                App(driverFun, esMobil)
+                                principalAct.estatAct.value = false
                             }
 
                             if (openDialogTancarSessio.value) {
@@ -891,7 +895,7 @@ class BottomBar() {
                                     )
                                 } else {
                                     AsyncImage(
-                                        model = element.fkUsuari!!.fotoUsuari,
+                                        model = urlApi + element.fkUsuari!!.fotoUsuari,
                                         contentDescription = element.fkUsuari!!.nomUsuari,
                                         modifier = Modifier.padding(5.dp).size((100.dp)),
                                         alignment = Alignment.Center,
@@ -1292,7 +1296,7 @@ class BottomBar() {
                                         )
                                     } else {
                                         AsyncImage(
-                                            model = element.fkUsuari!!.fotoUsuari,
+                                            model = urlApi+ element.fkUsuari!!.fotoUsuari,
                                             contentDescription = element.fkUsuari!!.nomUsuari,
                                             modifier = Modifier.padding(10.dp)
                                                 .size((100.dp)), //.clip(RoundedCornerShape(50.dp)),
@@ -1639,7 +1643,7 @@ class BottomBar() {
         scope: CoroutineScope,
         snackbarHostState: androidx.compose.material3.SnackbarHostState
     ) {
-        var esUser = userId == null
+//        var esUser = userId == null
         var api = ApiService()
         var usuari: Usuari? = null
         var user: Usuaris? = null
@@ -1649,6 +1653,7 @@ class BottomBar() {
             }
             cor.join()
         }
+        var esUser = userId == null || userId == user!!.usuariId!!.toInt()
 
         // si ets usuari actual, es esuser, per tant no es mostra el boto de seguir
         if (esUser) {
@@ -1667,6 +1672,7 @@ class BottomBar() {
             }
         }
 
+        userId = null
 
         var getLlistesUsuari by remember { mutableStateOf<List<Lliste>?>(null) }
         runBlocking {
@@ -1732,7 +1738,7 @@ class BottomBar() {
                             )
                         } else {
                             AsyncImage(
-                                model = fotoUsuari,
+                                model = urlApi+fotoUsuari,
                                 contentDescription = "usuari!!.nomUsuari",
                                 modifier = Modifier.size((150.dp)),
                                 alignment = Alignment.Center,
@@ -1750,7 +1756,7 @@ class BottomBar() {
                             )
                             var textBoto by remember { mutableStateOf("") }
 
-                            if (esUser /*|| usuari.usuariId == user!!.usuariId*/) {
+                            if (esUser || usuari!!.usuariId!!.toLong() == user!!.usuariId) {
                                 textBoto = "Editar foto"
                                 Button(
                                     onClick = {
@@ -1944,6 +1950,7 @@ class BottomBar() {
                                             viewModel.selectedItem.value
                                         viewModel.selectedItem.value = 7
                                         contingut = contingutDestacat
+                                        userId = usuari!!.usuariId
                                     },
                                 alignment = Alignment.Center,
                                 contentScale = ContentScale.Fit,
@@ -1974,6 +1981,7 @@ class BottomBar() {
                                             viewModel.selectedItem.value
                                         viewModel.selectedItem.value = 7
                                         contingut = contingutDestacat
+                                        userId = usuari!!.usuariId
                                     },
                                 alignment = Alignment.Center,
                                 contentScale = ContentScale.Fit,
@@ -2200,6 +2208,7 @@ class BottomBar() {
                                             viewModel.selectedItem.value
                                         viewModel.selectedItem.value = 7
                                         contingut = llista.cuntigutLlistes[page]?.fkContingut
+                                        userId = usuari!!.usuariId
                                     },
                         ) {
                             Column {
@@ -2280,6 +2289,7 @@ class BottomBar() {
                                                 viewModel.selectedItem.value
                                             viewModel.selectedItem.value = 7
                                             contingut = llista.cuntigutLlistes[page]?.fkContingut
+                                            userId = usuari!!.usuariId
                                         },
                             ) {
                                 Row {
@@ -3335,6 +3345,9 @@ class BottomBar() {
                                             snackbarHostState.showSnackbar("Valoracio guardada")
                                         }
                                         openDialogValoracio.value = false
+                                        scope.launch{
+                                            valoracioMitjana = api.getContingutBD(contingutSeleccionat!!.contingutId!!)
+                                        }
                                     }) {
                                 Text(text = "Guardar")
                             }
@@ -3839,7 +3852,7 @@ class BottomBar() {
                                         )
                                     } else {
                                         AsyncImage(
-                                            model = element.fotoUsuari,
+                                            model =urlApi+ element.fotoUsuari,
                                             contentDescription = element.fotoUsuari,
                                             modifier = Modifier.size((100.dp)),
                                             alignment = Alignment.Center,
@@ -4084,7 +4097,7 @@ class BottomBar() {
                                         )
                                     } else {
                                         AsyncImage(
-                                            model = usuariComentari!!.fotoUsuari,
+                                            model =urlApi+ usuariComentari!!.fotoUsuari,
                                             contentDescription = comentari.comentariId.toString(),
                                             modifier = Modifier.size((90.dp)),
                                             alignment = Alignment.Center,
@@ -4259,7 +4272,7 @@ class BottomBar() {
                                                                 )
                                                             } else {
                                                                 AsyncImage(
-                                                                    model = usuariResposta!!.fotoUsuari,
+                                                                    model =urlApi+ usuariResposta!!.fotoUsuari,
                                                                     contentDescription = comentari.comentariId.toString(),
                                                                     modifier = Modifier.size((90.dp)),
                                                                     alignment = Alignment.Center,
@@ -4413,7 +4426,15 @@ class BottomBar() {
         }
 
 
-        Column(Modifier.padding(10.dp, 10.dp)) {
+        Column(
+//            Modifier.padding(10.dp, 10.dp)
+            modifier =
+                if (esMobil) {
+                    Modifier.padding(10.dp, 10.dp, bottom = 65.dp)
+                } else {
+                    Modifier.padding(start = 10.dp, top = 70.dp, end = 10.dp, bottom = 10.dp)
+                }
+        ) {
             Button(onClick = {
                 val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
                 val currentDate = sdf.format(Date())
